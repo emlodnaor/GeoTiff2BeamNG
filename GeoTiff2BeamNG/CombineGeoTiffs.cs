@@ -4,14 +4,29 @@ using System.Data;
 
 internal class CombineGeoTiffs
 {
-    public CombineGeoTiffs()
+    internal FileInfo InputFolder { get;}
+    internal FileInfo OutputFolder { get;}
+    public CombineGeoTiffs(FileInfo inputFolder, FileInfo outputFolder)
     {
+        InputFolder= inputFolder;
+        OutputFolder= outputFolder;
     }
 
     internal async Task<BoundaryBox> Combine()
     {
+        var inputFiles = new List<string>();
+        var tifInputFiles = Directory.GetFiles(InputFolder.FullName, "*.tif");
+        var tiffInputFiles = Directory.GetFiles(InputFolder.FullName, "*.tiff");
+        var geotiffInputFiles = Directory.GetFiles(InputFolder.FullName, "*.geotiff");
+        inputFiles.AddRange(tifInputFiles.ToList());
+        inputFiles.AddRange(tiffInputFiles.ToList());
+        inputFiles.AddRange(geotiffInputFiles.ToList());
 
-        var inputFiles = Directory.GetFiles("C:\\Users\\emlodnaor\\Downloads\\Sticky", "*.tif");
+        if (inputFiles.Count == 0)
+        {
+            Console.WriteLine($"No files found in '{InputFolder}'. .tif, .tiff and .geotiff supported");
+            Environment.Exit(0);
+        }  
 
         // Initialize variables to store the overall bounding box of all input files
         double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
@@ -65,13 +80,16 @@ internal class CombineGeoTiffs
         var centerX = minX + ((maxX - minX) / 2);
         var centerY = minY + ((maxY - minY) / 2);
 
-
-
-        var grid = new decimal[(int)totalExtent, (int)totalExtent];
-
         // Calculate the dimensions of the final output image
-        int totalWidth = tileWidth * (int)Math.Sqrt(inputFiles.Length);
+        int totalWidth = tileWidth * (int)Math.Sqrt(inputFiles.Count);
         int totalHeight = totalWidth;
+
+        if (totalWidth == 0 || totalHeight == 0)
+        {
+            Console.WriteLine("The files in the input folder, does not create a map large enough to make the minimum size map of 2048x2048m, please add more files!");
+            Console.WriteLine($"Current extent: Longitudes: {extentX} Latitudes: {extentY}");
+            Environment.Exit(0);
+        }
 
         var outputFile = "output.tif";
         if (File.Exists(outputFile)) File.Delete(outputFile);

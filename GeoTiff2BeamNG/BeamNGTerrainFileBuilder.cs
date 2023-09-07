@@ -3,14 +3,17 @@
 internal class BeamNGTerrainFileBuilder
 {
     private string croppedOutputFile;
+    private FileInfo OutputDirectory { get; }
 
-    public BeamNGTerrainFileBuilder(string croppedOutputFile)
+    public BeamNGTerrainFileBuilder(string croppedOutputFile, FileInfo outputDirectory)
     {
         this.croppedOutputFile = croppedOutputFile;
+        OutputDirectory = outputDirectory;
     }
 
     internal async Task Build()
     {
+        
         List<string> materialNames = new() //This should be dynamic!!!
             {
                 "Grass2",
@@ -26,14 +29,14 @@ internal class BeamNGTerrainFileBuilder
 
 
     }
-    private static void WriteTerrainFile(double[,] heightArray, List<string> materialNames)
+    private void WriteTerrainFile(double[,] heightArray, List<string> materialNames)
     {
         //data to the terrainfile is seemingly written to file startin lower left, to lower right, ending at upperright 
         byte version = 8; // unsure if beamng render/map version, or version of the map
 
         uint size = (uint)heightArray.GetLength(0);
 
-        var binaryWriter = new BinaryWriter(File.Open($@"C:\Users\emlodnaor\Source\Repos\GeoTiff2BeamNG\GeoTiff2BeamNG\bin\Debug\net7.0\theTerrain.ter", FileMode.Create));
+        var binaryWriter = new BinaryWriter(File.Open($@"{OutputDirectory.FullName}\theTerrain.ter", FileMode.Create));
         binaryWriter.Write(version);
         binaryWriter.Write(size);
 
