@@ -138,8 +138,6 @@ internal class CombineGeoTiffs
         firstDataset.Dispose();
         outputDataset.Dispose();
         
-        System.Threading.Thread.Sleep(10000); // Wait for 1 second
-        
         decimal bbLon = (decimal)centerX;
         decimal bbLat = (decimal)centerY;
         decimal bbr = (decimal)totalExtent / 2;
