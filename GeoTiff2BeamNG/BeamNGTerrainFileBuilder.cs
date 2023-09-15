@@ -1,20 +1,23 @@
-﻿using OSGeo.GDAL;
+﻿using GeoTiff2BeamNG;
+using OSGeo.GDAL;
+using System.ComponentModel;
 
 internal class BeamNGTerrainFileBuilder
 {
-    private string croppedOutputFile;
+    private string CroppedOutputFile;
     private DirectoryInfo OutputDirectory { get; }
     private DirectoryInfo InputDirectory { get; }
 
     public BeamNGTerrainFileBuilder(string croppedOutputFile, DirectoryInfo outputDirectory, DirectoryInfo inputDirectory)
     {
-        this.croppedOutputFile = croppedOutputFile;
+        CroppedOutputFile = croppedOutputFile;
         OutputDirectory = outputDirectory;
         InputDirectory = inputDirectory;
     }
 
-    internal async Task Build()
+    internal void Build()
     {
+        
         var materialNames = new List<string>();
 
         var layers = Directory.GetFiles(InputDirectory.FullName, "*.png");
@@ -30,25 +33,33 @@ internal class BeamNGTerrainFileBuilder
                 "ROCK",
                 "asphalt2"
             };
+            var materialNamesAsString = string.Join(", ", materialNames);
+            LoggeM.WriteLine($"Using default material list ({materialNamesAsString})");
+            LoggeM.WriteLine("If you want to use your own materials, add png's to the input folder with filename format materialName_Priority.png, eg: ROCK_10.png");
         }
         foreach ( var layer in layers)
         {
-            materialNames.Add(layer);
+            var filename = new FileInfo(layer).Name;
+            var materialName = filename.Split("_").First();
+
+            materialNames.Add(materialName);
+            LoggeM.WriteLine($"Added {materialName} to the material list");
         }
 
-        var heightArray = GetHeightArray(croppedOutputFile);
+        var heightArray = GetHeightArray(CroppedOutputFile);
         WriteTerrainFile(heightArray, materialNames);
-
 
     }
     private void WriteTerrainFile(double[,] heightArray, List<string> materialNames)
     {
+        LoggeM.WriteLine("Creating theTerrain.ter file");
         //data to the terrainfile is seemingly written to file startin lower left, to lower right, ending at upperright 
         byte version = 8; // unsure if beamng render/map version, or version of the map
 
         uint size = (uint)heightArray.GetLength(0);
 
-        var binaryWriter = new BinaryWriter(File.Open($@"{OutputDirectory.FullName}\theTerrain.ter", FileMode.Create));
+        var dateFileString = DateTime.Now.ToString("yyyyMMdd_HHmmss_");
+        var binaryWriter = new BinaryWriter(File.Open($@"{OutputDirectory.FullName}\{dateFileString}theTerrain.ter", FileMode.Create));
         binaryWriter.Write(version);
         binaryWriter.Write(size);
 
@@ -63,18 +74,21 @@ internal class BeamNGTerrainFileBuilder
     }
     private static void WriteMaterialNames(BinaryWriter binaryWriter, List<string> materialNames)
     {
+        LoggeM.WriteLine("Adding material names to the terrain file...");
         foreach (var materialName in materialNames)
             binaryWriter.Write(materialName);
     }
 
     private static void WriteLayerTexture(BinaryWriter binaryWriter, double[,] heightArray)
     {
+        LoggeM.WriteLine("Painting the material onto the terrain...");
         foreach (var p in heightArray)
             binaryWriter.Write(0);
     }
 
     private static void WriteLayerMap(BinaryWriter binaryWriter, double[,] heightArray)
     {
+
         var longitudes = heightArray.GetLength(0);
         var latitudes = heightArray.GetLength(1);
 
@@ -90,7 +104,7 @@ internal class BeamNGTerrainFileBuilder
 
             longitudeCounter++;
 
-            if (longitudeCounter > longitudes - 1) //unsure
+            if (longitudeCounter > longitudes - 1) 
             {
                 longitudeCounter = 0;
                 latitudeCounter++;
@@ -100,6 +114,7 @@ internal class BeamNGTerrainFileBuilder
 
     private static void WriteHeightMap(BinaryWriter binaryWriter, double[,] heightArray)
     {
+        LoggeM.WriteLine("Setting terrain heigt points...");
         var minAltitude = double.MaxValue;
         var maxAltitude = double.MinValue;
         foreach ( var height in heightArray ) 
@@ -130,7 +145,7 @@ internal class BeamNGTerrainFileBuilder
                 latitudeCounter++;
             }
         }
-        Console.WriteLine($"Done setting heigh map. diffHeight: {heightDifference}");
+        LoggeM.WriteLine($"Done setting the heigh points. minAltitude: {minAltitude} maxAltitude: {maxAltitude} difference: {heightDifference}");
 
     }
     
@@ -171,7 +186,11 @@ internal class BeamNGTerrainFileBuilder
                 latitudeCounter--;
             }
         }
+        dataSet.FlushCache();
+        dataSet.Dispose();
 
+        
+        
         return resultPixelValues;
     }
 }

@@ -5,15 +5,16 @@ using System.Data;
 internal class CombineGeoTiffs
 {
     internal DirectoryInfo InputFolder { get;}
-    internal DirectoryInfo OutputFolder { get;}
-    public CombineGeoTiffs(DirectoryInfo inputFolder, DirectoryInfo outputFolder)
+    internal string CombinedOutputFile;
+    public CombineGeoTiffs(DirectoryInfo inputFolder, string combinedOutputFile)
     {
         InputFolder= inputFolder;
-        OutputFolder= outputFolder;
+        CombinedOutputFile= combinedOutputFile;
     }
 
     internal async Task<BoundaryBox> Combine()
     {
+        LoggeM.WriteLine("Combining GeoTiff files from input folder...");
         var inputFiles = new List<string>();
         var tifInputFiles = Directory.GetFiles(InputFolder.FullName, "*.tif");
         var tiffInputFiles = Directory.GetFiles(InputFolder.FullName, "*.tiff");
@@ -24,9 +25,11 @@ internal class CombineGeoTiffs
 
         if (inputFiles.Count == 0)
         {
-            Console.WriteLine($"No files found in '{InputFolder}'. .tif, .tiff and .geotiff supported");
+            LoggeM.WriteLine($"No files found in '{InputFolder}'. .tif, .tiff and .geotiff supported");
             Environment.Exit(0);
-        }  
+        }
+
+        LoggeM.WriteLine($"Found {inputFiles.Count} files");
 
         // Initialize variables to store the overall bounding box of all input files
         double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
@@ -88,12 +91,12 @@ internal class CombineGeoTiffs
 
         if (totalWidth == 0 || totalHeight == 0)
         {
-            Console.WriteLine("The files in the input folder, does not create a map large enough to make the minimum size map of 2048x2048m, please add more files!");
-            Console.WriteLine($"Current extent: Longitudes: {extentX} Latitudes: {extentY}");
+            LoggeM.WriteLine("The files in the input folder, does not create a map large enough to make the minimum size map of 2048x2048m, please add more files!");
+            LoggeM.WriteLine($"Current extent: Longitudes: {extentX} Latitudes: {extentY}");
             Environment.Exit(0);
         }
 
-        var outputFile = "output.tif";
+        var outputFile = CombinedOutputFile;
         if (File.Exists(outputFile)) File.Delete(outputFile);
 
         // Create the output dataset with the calculated dimensions

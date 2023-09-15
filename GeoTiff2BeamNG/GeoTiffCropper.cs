@@ -41,6 +41,7 @@ namespace GeoTiff2BeamNG
                 outputDataset.FlushCache();
                 outputDataset.Dispose();
             }
+            
         }
 
         private int CalculateXOffset(double[] geoTransform, BoundaryBox inputBoundaryBox)

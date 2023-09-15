@@ -13,11 +13,25 @@ var CroppedOutputFile = "Cropped.tif";
 CheckArgs();
 GdalSetup();
 
-BoundaryBox inputBB = await new CombineGeoTiffs(InputDirectory, OutputDirectory).Combine();
+BoundaryBox inputBB = await new CombineGeoTiffs(InputDirectory, CombinedOutputFile).Combine();
 
 await new GeoTiffCropper().GeoTiffOutputExtractor(CombinedOutputFile, CroppedOutputFile, inputBB);
 
-await new BeamNGTerrainFileBuilder(CroppedOutputFile, OutputDirectory, InputDirectory).Build();
+
+new BeamNGTerrainFileBuilder(CroppedOutputFile, OutputDirectory, InputDirectory).Build();
+
+
+Cleanup();
+
+void Cleanup()
+{
+    LoggeM.WriteLine("Cleaning up temporary files...");
+    File.Delete(CombinedOutputFile);
+    File.Delete("theTerrain.ter");
+    //File.Delete(CroppedOutputFile);
+    
+  
+}
 
 //
 void CheckArgs()
@@ -34,12 +48,12 @@ void CheckArgs()
 
     if (!InputDirectory.Exists)
     {
-        Console.WriteLine($"'{InputDirectory.FullName}' is not a valid folder, use -i 'Path' to set correct folder, or create the default folders.");
+        LoggeM.WriteLine($"'{InputDirectory.FullName}' is not a valid folder, use -i 'Path' to set correct folder, or create the folder.");
         exit = true;
     }
     if (!OutputDirectory.Exists)
     {
-        Console.WriteLine($"'{OutputDirectory.FullName}' is not a valid folder, use -o 'Path' to set correct folder, or create the default folders.");
+        LoggeM.WriteLine($"'{OutputDirectory.FullName}' is not a valid folder, use -o 'Path' to set correct folder, or create the folder.");
         exit = true;
     }
     if (exit) Environment.Exit(0);
