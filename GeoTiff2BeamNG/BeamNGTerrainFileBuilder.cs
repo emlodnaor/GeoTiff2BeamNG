@@ -3,18 +3,25 @@
 internal class BeamNGTerrainFileBuilder
 {
     private string croppedOutputFile;
-    private FileInfo OutputDirectory { get; }
+    private DirectoryInfo OutputDirectory { get; }
+    private DirectoryInfo InputDirectory { get; }
 
-    public BeamNGTerrainFileBuilder(string croppedOutputFile, FileInfo outputDirectory)
+    public BeamNGTerrainFileBuilder(string croppedOutputFile, DirectoryInfo outputDirectory, DirectoryInfo inputDirectory)
     {
         this.croppedOutputFile = croppedOutputFile;
         OutputDirectory = outputDirectory;
+        InputDirectory = inputDirectory;
     }
 
     internal async Task Build()
     {
-        
-        List<string> materialNames = new() //This should be dynamic!!!
+        var materialNames = new List<string>();
+
+        var layers = Directory.GetFiles(InputDirectory.FullName, "*.png");
+
+        if (layers.Count() == 0)
+        {
+            materialNames = new() //This should be dynamic!!!
             {
                 "Grass2",
                 "Dirt",
@@ -23,6 +30,11 @@ internal class BeamNGTerrainFileBuilder
                 "ROCK",
                 "asphalt2"
             };
+        }
+        foreach ( var layer in layers)
+        {
+            materialNames.Add(layer);
+        }
 
         var heightArray = GetHeightArray(croppedOutputFile);
         WriteTerrainFile(heightArray, materialNames);

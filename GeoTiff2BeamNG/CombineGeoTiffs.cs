@@ -4,9 +4,9 @@ using System.Data;
 
 internal class CombineGeoTiffs
 {
-    internal FileInfo InputFolder { get;}
-    internal FileInfo OutputFolder { get;}
-    public CombineGeoTiffs(FileInfo inputFolder, FileInfo outputFolder)
+    internal DirectoryInfo InputFolder { get;}
+    internal DirectoryInfo OutputFolder { get;}
+    public CombineGeoTiffs(DirectoryInfo inputFolder, DirectoryInfo outputFolder)
     {
         InputFolder= inputFolder;
         OutputFolder= outputFolder;
@@ -65,8 +65,10 @@ internal class CombineGeoTiffs
 
             dataset.Dispose();
         }
-        maxX -= tileWidth * pixelSizeX; // Adjust for pixel size
-        minY -= tileHeight * pixelSizeY; // Adjust for pixel size
+        //maxX -= tileWidth * pixelSizeX; // Adjust for pixel size
+        //minY -= tileHeight * pixelSizeY; // Adjust for pixel size
+
+        ////////////////////////////////////this is wrong when there is just one tile... somehow... 
 
         var extentX = maxX - minX;
         var extentY = maxY - minY;
