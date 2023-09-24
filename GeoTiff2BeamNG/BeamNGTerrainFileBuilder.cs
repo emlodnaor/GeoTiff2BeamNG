@@ -145,7 +145,7 @@ internal class BeamNGTerrainFileBuilder
                 latitudeCounter++;
             }
         }
-        LoggeM.WriteLine($"Done setting the heigh points. minAltitude: {minAltitude} maxAltitude: {maxAltitude} difference: {heightDifference}");
+        LoggeM.WriteLine($"Done setting the height points. minAltitude: {minAltitude} maxAltitude: {maxAltitude} difference: {heightDifference}");
 
     }
     
