@@ -19,7 +19,7 @@ new BeamNGTerrainFileBuilder(CroppedOutputFile, OutputDirectory, InputDirectory)
 
 Cleanup();
 
-Console.WriteLine("We are done, press a key to exit...");
+Console.WriteLine("We are done, press enter to exit...");
 Console.ReadLine();
 void Cleanup()
 {

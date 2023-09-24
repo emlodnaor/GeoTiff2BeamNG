@@ -1,18 +1,22 @@
 ﻿using GeoTiff2BeamNG;
 using OSGeo.GDAL;
 using System.ComponentModel;
+using System.Windows.Markup;
 
 internal class BeamNGTerrainFileBuilder
 {
     private string CroppedOutputFile;
     private DirectoryInfo OutputDirectory { get; }
     private DirectoryInfo InputDirectory { get; }
-
+    private string DateFileString { get; }
+    private string TerrainFileName { get; }
     public BeamNGTerrainFileBuilder(string croppedOutputFile, DirectoryInfo outputDirectory, DirectoryInfo inputDirectory)
     {
         CroppedOutputFile = croppedOutputFile;
         OutputDirectory = outputDirectory;
         InputDirectory = inputDirectory;
+        DateFileString = DateTime.Now.ToString("yyyyMMdd_HHmmss_");
+        TerrainFileName = $"{DateFileString}theTerrain.ter";
     }
 
     internal void Build()
@@ -58,8 +62,8 @@ internal class BeamNGTerrainFileBuilder
 
         uint size = (uint)heightArray.GetLength(0);
 
-        var dateFileString = DateTime.Now.ToString("yyyyMMdd_HHmmss_");
-        var binaryWriter = new BinaryWriter(File.Open($@"{OutputDirectory.FullName}\{dateFileString}theTerrain.ter", FileMode.Create));
+        
+        var binaryWriter = new BinaryWriter(File.Open($@"{OutputDirectory.FullName}\{TerrainFileName}", FileMode.Create));
         binaryWriter.Write(version);
         binaryWriter.Write(size);
 
@@ -112,15 +116,15 @@ internal class BeamNGTerrainFileBuilder
         }
     }
 
-    private static void WriteHeightMap(BinaryWriter binaryWriter, double[,] heightArray)
+    private void WriteHeightMap(BinaryWriter binaryWriter, double[,] heightArray)
     {
         LoggeM.WriteLine("Setting terrain heigt points...");
         var minAltitude = double.MaxValue;
         var maxAltitude = double.MinValue;
-        foreach ( var height in heightArray ) 
-        { 
-            minAltitude = Math.Min(minAltitude,height);
-            maxAltitude= Math.Max(maxAltitude,height);
+        foreach (var height in heightArray)
+        {
+            minAltitude = Math.Min(minAltitude, height);
+            maxAltitude = Math.Max(maxAltitude, height);
         }
         var heightDifference = maxAltitude - minAltitude;
         var steps = 65535d;
@@ -146,6 +150,11 @@ internal class BeamNGTerrainFileBuilder
             }
         }
         LoggeM.WriteLine($"Done setting the height points. minAltitude: {minAltitude} maxAltitude: {maxAltitude} difference: {heightDifference}");
+
+        var jsonString = $""""name":"theTerrain","class":"TerrainBlock","persistentId":"ter_pid","__parent":"MissionGroup","position":[0,0,{minAltitude}],"materialTextureSet":"BON_AAA_000TerrainMaterialTextureSet","maxHeight":{heightDifference},"terrainFile":"/levels/YOURLEVELNAME/{TerrainFileName}"""";
+        jsonString = $"{{\"{jsonString}\"}}";
+
+        File.WriteAllText($"{OutputDirectory}\\{DateFileString}items.level.json", jsonString);
 
     }
     
