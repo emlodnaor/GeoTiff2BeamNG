@@ -14,26 +14,19 @@ CheckArgs();
 GdalSetup();
 
 BoundaryBox inputBB = await new CombineGeoTiffs(InputDirectory, CombinedOutputFile).Combine();
-
 await new GeoTiffCropper().GeoTiffOutputExtractor(CombinedOutputFile, CroppedOutputFile, inputBB);
-
-
 new BeamNGTerrainFileBuilder(CroppedOutputFile, OutputDirectory, InputDirectory).Build();
-
 
 Cleanup();
 
+Console.WriteLine("We are done, press a key to exit...");
+Console.ReadLine();
 void Cleanup()
 {
     LoggeM.WriteLine("Cleaning up temporary files...");
     File.Delete(CombinedOutputFile);
-    File.Delete("theTerrain.ter");
-    //File.Delete(CroppedOutputFile);
-    
-  
 }
 
-//
 void CheckArgs()
 {
     var exit = false;
