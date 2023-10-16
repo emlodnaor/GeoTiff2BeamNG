@@ -87,7 +87,7 @@ internal class CombineGeoTiffs
 
         // Calculate the dimensions of the final output image
         int totalWidth = tileWidth * (int)Math.Sqrt(inputFiles.Count);
-        int totalHeight = totalWidth;
+        int totalHeight = tileHeight * (int)Math.Sqrt(inputFiles.Count);
 
         if (totalWidth == 0 || totalHeight == 0)
         {
