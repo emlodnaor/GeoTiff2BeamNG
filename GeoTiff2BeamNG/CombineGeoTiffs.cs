@@ -57,7 +57,7 @@ internal class CombineGeoTiffs
             // Calculate the bounding box coordinates in geographic space
             double fileMinX = geoTransform[0];
             double fileMaxX = geoTransform[0] + geoTransform[1] * dataset.RasterXSize;
-            double fileMinY = geoTransform[3] - geoTransform[5] * dataset.RasterYSize;
+            double fileMinY = geoTransform[3] - geoTransform[1] * dataset.RasterYSize;
             double fileMaxY = geoTransform[3];
 
             // Update overall bounding box
@@ -80,7 +80,7 @@ internal class CombineGeoTiffs
         var totalExtentMultiplyerY = Math.Floor(extentY / 2048);
         var totalExtentX = (int)totalExtentMultiplyerX * 2048;
         var totalExtentY = (int)totalExtentMultiplyerY * 2048;
-        var totalExtent = Math.Max(totalExtentX, totalExtentY); // Take the maximum extent
+        var totalExtent = Math.Min(totalExtentX, totalExtentY); // Take the minimum extent
 
         var centerX = minX + ((maxX - minX) / 2);
         var centerY = minY + ((maxY - minY) / 2);

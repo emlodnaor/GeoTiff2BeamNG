@@ -31,6 +31,8 @@ namespace GeoTiff2BeamNG
                 int width = CalculateWidth(inputBoundaryBox, pixelSizeX);
                 int height = CalculateHeight(inputBoundaryBox, pixelSizeY);
 
+
+
                 Dataset outputDataset = CreateOutputDataset(filenameImg, width, height, inputDataset);
 
                 SetOutputGeoTransform(outputDataset, geoTransform, inputBoundaryBox);
@@ -46,12 +48,12 @@ namespace GeoTiff2BeamNG
 
         private int CalculateXOffset(BoundaryBox inputBoundaryBox, int rasterXSize)
         {
-            return (int)(rasterXSize - inputBoundaryBox.Height) /2;
+            return (int)(rasterXSize - inputBoundaryBox.Width) /2;
         }
 
         private int CalculateYOffset(BoundaryBox inputBoundaryBox, int rasterYSize)
         {
-            return (int)(rasterYSize - inputBoundaryBox.Width) / 2;
+            return (int)(rasterYSize - inputBoundaryBox.Height) / 2;
         }
 
         private int CalculateWidth(BoundaryBox inputBoundaryBox, double pixelSizeX)
