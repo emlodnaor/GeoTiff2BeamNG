@@ -76,8 +76,14 @@ internal class CombineGeoTiffs
         var extentX = maxX - minX;
         var extentY = maxY - minY;
 
-        var totalExtentMultiplyerX = Math.Floor(extentX / 2048);
-        var totalExtentMultiplyerY = Math.Floor(extentY / 2048);
+        var totalExtentMultiplyerX = (int)(Math.Pow(2, Math.Floor(Math.Log(extentX, 2))))/2048;//Math.Floor(extentX / 2048);
+        var totalExtentMultiplyerY = (int)(Math.Pow(2, Math.Floor(Math.Log(extentX, 2))))/2048;//Math.Floor(extentY / 2048);
+
+        if (totalExtentMultiplyerX == 3) totalExtentMultiplyerX = 2;
+        if (totalExtentMultiplyerX == 5) totalExtentMultiplyerX = 4;
+        if (totalExtentMultiplyerX == 6) totalExtentMultiplyerX = 4;
+        if (totalExtentMultiplyerX == 7) totalExtentMultiplyerX = 4;
+
         var totalExtentX = (int)totalExtentMultiplyerX * 2048;
         var totalExtentY = (int)totalExtentMultiplyerY * 2048;
         var totalExtent = Math.Min(totalExtentX, totalExtentY); // Take the minimum extent
