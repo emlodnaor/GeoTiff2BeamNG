@@ -1,4 +1,5 @@
 ﻿using GeoTiff2BeamNG;
+using ImageMagick;
 using OSGeo.GDAL;
 using System.ComponentModel;
 using System.Windows.Markup;
@@ -10,6 +11,8 @@ internal class BeamNGTerrainFileBuilder
     private DirectoryInfo InputDirectory { get; }
     private string DateFileString { get; }
     private string TerrainFileName { get; }
+
+    private Dictionary<string, MagickImage> images = new Dictionary<string, MagickImage>();
     public BeamNGTerrainFileBuilder(string croppedOutputFile, DirectoryInfo outputDirectory, DirectoryInfo inputDirectory)
     {
         CroppedOutputFile = croppedOutputFile;
@@ -41,6 +44,7 @@ internal class BeamNGTerrainFileBuilder
             LoggeM.WriteLine($"Using default material list ({materialNamesAsString})");
             LoggeM.WriteLine("If you want to use your own materials, add png's to the input folder with filename format materialName_Priority.png, eg: ROCK_10.png");
         }
+        if (layers.Count() > 0) { materialNames.Clear(); }
         foreach ( var layer in layers)
         {
             var filename = new FileInfo(layer).Name;
