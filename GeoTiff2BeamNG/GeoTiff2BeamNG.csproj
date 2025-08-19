@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="GDAL" Version="3.7.2" />
     <PackageReference Include="GDAL.Native" Version="3.7.2" />
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="13.4.0" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.7.0" />
   </ItemGroup>
 
 </Project>
